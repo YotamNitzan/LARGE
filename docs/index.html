@@ -1,0 +1,115 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>LARGE</title>
+
+    <!-- CSS includes -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+          integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="mainpage.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <h1><span style="font-size:36px">LARGE: Latent-Based Regression through GAN Semantics</span></h1>
+        <br>
+
+        <div class="authors">
+            <span style="font-size:18px"><a href="https://yotamnitzan.github.io/" target="new">Yotam Nitzan<sup>*</sup></a></span>
+            &nbsp;
+            <span style="font-size:18px"><a href="https://rinongal.github.io/"
+                                            target="new">Rinon Gal<sup>*</sup></a></span>
+            &nbsp;
+            <span style="font-size:18px"><a href="https://scholar.google.com/citations?user=iLLlWr8AAAAJ"
+                                            target="new">Ofir Brenner</a></span>
+            &nbsp;
+            <span style="font-size:18px"><a href="https://danielcohenor.com/"
+                                            target="new">Daniel Cohen-Or</a></span>
+            <br>
+            <span style="font-size:18px">Tel-Aviv University</span> <br>
+            <span style="font-size:14px">* Equal Contributors</span>
+        </div>
+    </div>
+    <br><br>
+    <div class="container-fluid-2">
+        <div class="row">
+            &nbsp; &nbsp; &nbsp; &nbsp; Age &nbsp; &nbsp; &nbsp; &nbsp; <img src="imgs/sort_cat_age.jpg" height="90px">
+        </div>
+        <div class="row">
+           &nbsp; &nbsp; Hair Color &nbsp; <img src="imgs/sort_black_blonde_hair.png" height="90px">
+        </div>
+        <div class="row">
+            Fur Fluffiness <img src="imgs/sort_dog_fluffiness.jpg" height="90px">
+        </div>
+    </div>
+
+    <br>
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-1 col-md-0 col-sm-0"></div>
+            <div class="col-lg-1 col-md-0 col-sm-0"></div>
+
+            <div class="col-lg-3 col-md-4 col-sm-4 text-center">
+                <div class="service-box mt-5 mx-auto">
+                    <a href="FILL" target="_blank">
+                        <i class="far fa-4x fa-file text-primary mb-3 "></i>
+                    </a>
+                    <h3 class="mb-3">Paper</h3>
+                </div>
+            </div>
+
+            <div class="col-lg-1 col-md-0 col-sm-0"></div>
+            <div class="col-lg-1 col-md-0 col-sm-0"></div>
+
+            <div class="col-lg-2 col-md-4 col-sm-6 text-center">
+                <div class="service-box mt-5 mx-auto">
+                    <a href="https://github.com/YotamNitzan/LARGE" target="_blank">
+                        <i class="fab fa-4x fa-github text-primary mb-3 "></i>
+                    </a>
+                    <h3 class="mb-3">Code</h3>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Abstract</h2>
+        We propose a novel method for solving regression tasks using few-shot or weak supervision. At the core of our
+        method is the fundamental observation that GANs are incredibly successful at encoding semantic information within
+        their latent space,even in a completely unsupervised setting. For modern generative frameworks,this semantic
+        encoding manifests as smooth, linear directions which affect image attributes in a disentangled manner. These
+        directions have been widely used inGAN-based image editing. We show that such directions are not only linear,
+        but that the magnitude of change induced on the respective attribute is approximately linear with respect to the
+        distance traveled along them. By leveraging this observation,our method turns a pre-trained GAN into a
+        regression model, using as few as two labeled samples. This enables solving regression tasks on datasets and
+        attributes which are difficult to produce quality supervision for. Additionally, we show that the same
+        latent-distances can be used to sort collections of images by the strength of given attributes, even in the
+        absence of explicit supervision. Extensive experimental evaluations demonstrate that our method can be applied
+        across a wide range of domains, leverage multiple latent direction discovery frameworks, and achieve
+        state-of-the-art results in few-shot and low-supervision settings, even when compared to methods designed to
+        tackle a single task.
+    </div>
+
+    <div class="container">
+    <h2>Citation</h2>
+    <pre class="highlight">
+    </pre>
+    </div>
+
+    <div class="container">
+        <h2>Contact</h2>
+        <div>
+            yotamnitzan at gmail dot com
+        </div>
+    </div>
+
+    <div id="footer">
+    </div>
+
+
+</body>
+</html>
