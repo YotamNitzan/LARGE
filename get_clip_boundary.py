@@ -179,7 +179,7 @@ def get_val_by_regex(string, regex, type):
         raise e
     return type(regex.findall(string)[0][1])
 
-def precompute_feature_directions(data_dir):
+def precompute_feature_directions(data_dir, model_layers):
 
     latents_dir = os.path.join(data_dir, 'latents')
     feature_dir = os.path.join(data_dir, 'clip_features')
@@ -189,7 +189,7 @@ def precompute_feature_directions(data_dir):
     latent_files = [os.path.join(latents_dir, file_name) for file_name in tqdm(latent_dir_list) if file_name.endswith(".npy") and 'layer' in file_name]
     feature_files = [os.path.join(feature_dir, file_name) for file_name in tqdm(latent_dir_list) if file_name.endswith(".npy") and 'layer' in file_name]
 
-    feature_dir_array = np.zeros(shape=(18, 512, 2, 512))
+    feature_dir_array = np.zeros(shape=(model_layers, 512, 2, 512))
 
     for feature_file in tqdm(feature_files):
         layer_num = get_val_by_regex(feature_file, layer_rgx, int)
@@ -204,11 +204,11 @@ def precompute_feature_directions(data_dir):
 
     return feature_dir_array
 
-def get_boundary_for_direction_precomp(clip_embeddings, text_direction, percentile=80):
+def get_boundary_for_direction_precomp(clip_embeddings, text_direction, model_layers, percentile=80):
 
-    projections = np.zeros((18, 512))
+    projections = np.zeros((model_layers, 512))
     
-    for layer_idx in tqdm(range(18)):
+    for layer_idx in tqdm(range(model_layers)):
         for code_idx in tqdm(range(512)):
             delta_embeddings = clip_embeddings[layer_idx, code_idx]
 
@@ -245,12 +245,14 @@ if __name__ == "__main__":
 
     parser.add_argument("--out_dir", required=True, help="Path to directory where outputs will be placed")
 
+    parser.add_argument("--model_layers", default=18, type=int, help="Number of W+ layers in the given model")
+
     args = parser.parse_args()
 
     if args.precomputed_dirs:
         feature_dir_array = np.load(args.precomputed_dirs)
     else:
-        feature_dir_array = precompute_feature_directions(args.latent_adjustment_dir)
+        feature_dir_array = precompute_feature_directions(args.latent_adjustment_dir, args.model_layers)
         if args.feature_dir_out:
             np.save(os.path.join(args.out_dir, "feature_dirs.npy"), feature_dir_array)
     
@@ -258,7 +260,7 @@ if __name__ == "__main__":
 
     direction = get_textual_direction([args.target_text, args.source_text], imagenet_templates, model)
 
-    boundary = get_boundary_for_direction_precomp(feature_dir_array, direction, percentile=args.cutoff_percentile)
+    boundary = get_boundary_for_direction_precomp(feature_dir_array, direction, args.model_layers, percentile=args.cutoff_percentile)
     
     boundary_dir = os.path.join(args.out_dir, args.name)
 

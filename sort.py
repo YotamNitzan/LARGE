@@ -20,7 +20,7 @@ import cv2
 
 matplotlib.use('Agg')
 
-from ganstudent_utils.latent_utils import LatentCode, LatentSpace
+from utils.latent_utils import LatentCode, LatentSpace
 
 #TODO: This file copies extensively from latent_svm.py and should be cleaned / changed to avoid repetitions.
 
@@ -62,6 +62,8 @@ def parse_args():
                         help='Convert a provided W boundary to W+ by repeating.')
 
     parser.add_argument('--seed', type=int, default=42, help="Random seed")
+
+    parser.add_argument('--model_layers', type=int, default=18, help="Number of W+ layers for the given model.")
 
     args = parser.parse_args()
 
@@ -110,7 +112,7 @@ if __name__ == '__main__':
     if boundary.latent_space is LatentSpace.S:
         num_layers = 26
     elif boundary.latent_space is LatentSpace.WP:
-        num_layers = 18
+        num_layers = args.model_layers
     else:
         num_layers = 1
 
