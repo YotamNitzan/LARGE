@@ -256,7 +256,7 @@ if __name__ == "__main__":
     
     model, preprocess = clip.load("ViT-B/32", device='cuda:0')
 
-    direction = get_textual_direction([args.source_text, args.target_text], imagenet_templates, model)
+    direction = get_textual_direction([args.target_text, args.source_text], imagenet_templates, model)
 
     boundary = get_boundary_for_direction_precomp(feature_dir_array, direction, percentile=args.cutoff_percentile)
     

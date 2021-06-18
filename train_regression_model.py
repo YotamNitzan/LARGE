@@ -17,9 +17,12 @@ import matplotlib
 
 import torch
 
+import pickle
+import os
+
 matplotlib.use('Agg')
 
-from ganstudent_utils.latent_utils import LatentCode, LatentSpace
+from utils.latent_utils import LatentCode, LatentSpace
 
 
 # Example args with S codes and layer weights:
@@ -41,8 +44,8 @@ class DistanceType(Enum):
     def __str__(self):
         return self.value
 
-def convert_to_layer_data(data_frame, data_path, num_layers, boundary, distance_type, intercept=0.,
-                          file_suffix='.pickle',max_samples=None):
+def convert_to_layer_data(data_frame, data_path, num_layers, boundary, distance_type,
+                          file_suffix='.pickle', max_samples=None):
     data_per_layer = {}
 
     for layer_num in range(num_layers):
@@ -63,12 +66,10 @@ def convert_to_layer_data(data_frame, data_path, num_layers, boundary, distance_
         else:
             distances = [latent.distance_to(boundary)]
             num_distances = 1
-            # distances = np.repeat(distances, num_layers) # Hack for minimal change compatibility
 
         for layer_num in range(num_distances):
             data_per_layer.setdefault(layer_num, {'distances': [], 'gt': []})
 
-        # for layer_num in range(num_layers):
             data_per_layer[layer_num]['distances'].append(distances[layer_num])
             data_per_layer[layer_num]['gt'].append(row[args.attribute])
 
@@ -88,10 +89,6 @@ def filter_data(data_frame, data_path, file_suffix='.pickle', attribute=None):
 
         if (attribute and not attribute in row) or (not latent_path.exists()):
             continue
-
-        # TODO: make this generic. For now if you want to filter BIWI images use this.
-        # if np.abs(float(row['roll'])) > 3.0:
-        #     continue
 
         has_latents_list.append(index)
 
@@ -177,10 +174,10 @@ def resolve_feature_min_distance(all_data, user_value, data_size, num_points):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='SVM Training')
+    parser = argparse.ArgumentParser(description='Linear regressor training script.')
 
-    parser.add_argument('--data-path', default='data/CelebA-HQ', help='path to dataset')
-    parser.add_argument('--output-dir', default='../paper/results', help='path to output dir')
+    parser.add_argument('--data-path', required=True, help='path to dataset')
+    parser.add_argument('--output-dir', required=True, help='path to output dir')
 
     parser.add_argument('--annotations-file', default='data/celeba_yaw_look_right_no_dist.csv',
                         help='path to annotation file')
@@ -224,6 +221,8 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
+
+    os.makedirs(args.output_dir, exist_ok=True)
 
     torch.manual_seed(2)
     np.random.seed(2)
@@ -272,52 +271,14 @@ if __name__ == '__main__':
     data_per_layer_test = convert_to_layer_data(test_df, args.data_path, num_layers, boundary, args.distance_type,
                                                 file_suffix=args.latent_file_ext)
 
-
-    rows = 9
-    cols = 2
-    import seaborn as sns
-    import matplotlib.pyplot as plt
-
-    # sns.set(rc={'axes.labelsize': 10})
-
-    fig, axes = plt.subplots(rows, cols, figsize=(63, 90))
-    # fig.suptitle('Correlation between distance from W-hyperplane and the n-layer of a W+ inverted face', size=60)
-
-    for l in range(rows*cols):
-        curr_row = l // cols
-        curr_col = l % cols
-
-        train_feature_maps, train_gt = prepare_features_and_gt_pairs([l], data_per_layer_train)
-        # test_feature_maps, test_gt = prepare_features_and_gt_pairs([l], data_per_layer_test)
-
-        reg = LinearRegression().fit(train_feature_maps, train_gt)
-        score = reg.score(train_feature_maps, train_gt)
-
-        df_layer = pd.DataFrame({'distance': np.squeeze(train_feature_maps), 'gt': np.squeeze(train_gt)})
-
-        plot = sns.regplot(data=df_layer, x='distance', y='gt', ax=axes[curr_row, curr_col])
-        axes[curr_row, curr_col].set_title(fr'Layer {l}: $R^2$={score:.3}', size=60)
-        axes[curr_row, curr_col].set(xlabel='', ylabel='')
-        axes[curr_row, curr_col].set_xticks([])
-        axes[curr_row, curr_col].set_yticks([])
-
-    fig = plot.get_figure()
-    fig.tight_layout()
-    fig.savefig('CelebA_correlation_all_layers_final-e4e.pdf')
-    exit()
-
     train_feature_maps, train_gt = prepare_features_and_gt_pairs(fit_layers, data_per_layer_train, layer_weights)
     test_feature_maps, test_gt = prepare_features_and_gt_pairs(fit_layers, data_per_layer_test, layer_weights)
-
-    name = f'{args.attribute}'
-    scatter_2d(name, train_feature_maps, train_gt)
 
     print(f"All data loaded. Total samples: {train_feature_maps.shape[0]}")
 
     if args.feature_sample_ratio != 1:
         if train_feature_maps.shape[1] != 1:
-            # TODO How can this be done non n-dim points?
-            raise NotImplementedError('TODO: How to find edges in N dimensional points?')
+            raise NotImplementedError('Point sampling is only implemented for single-dimensional features.')
 
         low_half_tail = (1 - args.feature_sample_ratio) / 2
         high_half_tail = args.feature_sample_ratio + low_half_tail
@@ -337,7 +298,6 @@ if __name__ == '__main__':
     print(f"Using layers: {fit_layers}")
 
     error_by_points = []
-    # for num_points in [2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 50, 100, 500, 1000]:
     for num_points in [2, 5, 10, 20, 1000]:
         error = {'MAE': [], 'R2': [], 'coefs': []}
 
@@ -401,11 +361,6 @@ if __name__ == '__main__':
 
         print(text)
 
-        mCoefs = np.mean(error['coefs'], axis=0)
-        mCoefs /= np.sum(mCoefs)
-        text = f'For n={num_points}. Mean fit coefficients={mCoefs}'
-        # print(text)
+        with open(os.path.join(args.output_dir, f"model_{num_points}.pickle"), 'wb') as fp:
+            pickle.dump(reg, fp)
 
-    error_by_points = pd.DataFrame(error_by_points)
-    out_file = Path(args.output_dir).joinpath(f'latent_svm-error_{args.attribute}_psp_euclidean.csv')
-    error_by_points.to_csv(out_file, header=True, index=False)
