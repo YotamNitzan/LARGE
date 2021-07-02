@@ -104,10 +104,10 @@ if __name__ == '__main__':
                             if args.negative_boundary_path else None
 
     if args.boundary_to_wp:
-        boundary = boundary.to_wp()
+        boundary = boundary.to_wp(args.model_layers)
 
         if negative_boundary is not None:
-            negative_boundary = negative_boundary.to_wp()
+            negative_boundary = negative_boundary.to_wp(args.model_layers)
 
     if boundary.latent_space is LatentSpace.S:
         num_layers = 26
