@@ -197,4 +197,4 @@ if __name__ == '__main__':
         imgs = [cv2.resize(x, tuple(args.resize_output)) for x in imgs]
 
     sorted_img = np.concatenate(imgs, axis=1)
-    cv2.imwrite(os.path.join(args.out_dir, "all_sorted-pp2.jpg"), sorted_img)
+    cv2.imwrite(os.path.join(args.out_dir, "all_sorted.jpg"), sorted_img)
