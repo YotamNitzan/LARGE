@@ -25,18 +25,6 @@ matplotlib.use('Agg')
 from utils.latent_utils import LatentCode, LatentSpace
 
 
-# Example args with S codes and layer weights:
-#  --data-path /disk2/rinong/data/BIWI/inverted/s_latents/
-#  --annotations-file /disk2/rinong/data/BIWI/inverted/biwi_yaw_look_right_disc_and_binary.csv
-#  --boundary_path /disk2/rinong/data/GANStudent/s_boundary/
-#  --layer_weights_path /disk2/rinong/output/GANStudent/resnet18_yaw/test_latents/S_layer_weights.npy
-
-# Example args with WP codes and W boundary, no layer weights:
-#  --data-path /disk2/rinong/data/GANStudent/CelebA-HQ-inverted/psp/val/inference_results/latents/
-#  --annotations-file /disk2/rinong/data/GANStudent/celeba_yaw_look_right_disc_and_binary.csv
-#  --boundary_path /disk2/rinong/data/GANStudent/boundary/
-#  --boundary_to_wp
-
 class DistanceType(Enum):
     per_layer = 'per_layer'
     euclidean = 'euclidean'
@@ -51,7 +39,7 @@ def convert_to_layer_data(data_frame, data_path, num_layers, boundary, distance_
     for layer_num in range(num_layers):
         pass
 
-    # TODO: for code release - use pd.apply instead of iterating rows.
+    # TODO: use pd.apply instead of iterating rows.
     for index, row in tqdm(data_frame.iterrows()):
 
         latent_path = Path(data_path).joinpath(str(index)).with_suffix(file_suffix)
@@ -82,7 +70,7 @@ def convert_to_layer_data(data_frame, data_path, num_layers, boundary, distance_
 def filter_data(data_frame, data_path, file_suffix='.pickle', attribute=None):
     has_latents_list = []
 
-    # TODO: for code release - use pd.apply instead of iterating rows.
+    # TODO: use pd.apply instead of iterating rows.
     for index, row in tqdm(data_frame.iterrows()):
 
         latent_path = Path(data_path).joinpath(str(index)).with_suffix(file_suffix)
@@ -163,10 +151,6 @@ def resolve_feature_min_distance(all_data, user_value, data_size, num_points):
             user_value = -np.inf
 
         return user_value
-
-    # TODO Find a well-motivated Hyper-formula!
-    #  d=50 is good for n=2 & d=data_size / (10 * num_points * 2) gave good results for n=5,10,20,30
-    # formula = data_size / (10 * num_points)  # linear decay
 
     value_range = all_data.max() - all_data.min()
     formula = value_range / (num_points ** 1.3)
@@ -345,8 +329,6 @@ if __name__ == '__main__':
             unique, counts = np.unique(np.array(idxs), return_counts=True, axis=0)
             print(f'For n={num_points}: there were {unique.shape[0]} unique groups sampled')
 
-            # for u, c in zip(unique, counts):
-            #     print(f'Value: {u} appeared {c} times')
         except Exception as e:
             pass
 
