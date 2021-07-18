@@ -62,8 +62,8 @@ def parse_args():
                         help='How to calculate distance between latent code and boundary')
 
     parser.add_argument('--resize_output', nargs='+', type=int)
-    parser.add_argument('--weighted_edges', action='store_true', help='Over-weight edges of sort for datasets'
-                                                                      'with small std')
+    parser.add_argument('--weighted_edges', default=False, choices=[True, False], type=bool,
+                        help='Over-weight edges of sort for datasets with small std')
 
     args = parser.parse_args()
 
