@@ -86,10 +86,12 @@ class LatentCode(object):
 
         if file_path.endswith(".npy"):
             latent = np.load(file_path)
-        if file_path.endswith(".pkl") or file_path.endswith(".pickle"):
+        elif file_path.endswith(".pkl") or file_path.endswith(".pickle"):
             latent = load_latent_pkl(file_path)
             if isinstance(latent, torch.Tensor):
                 latent = latent.detach().cpu().numpy()
+        else:
+            raise NotImplementedError(f'Cannot load latent with suffix {file_path.suffix}')
 
         if len(latent) == 1:
             latent = latent[0]
