@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 
 from tqdm import tqdm
-from ganstudent_utils.editable_generation import LatentSampler, project_latent_to_plane
 import torch
 
 import itertools
@@ -23,6 +22,37 @@ LATENT_SPACE_DIM = 512
 S_LAYER_SIZES = [512, ] * 15 + [256, ] * 3 + [128, ] * 3 + [64, ] * 3 + [32, ] * 2
 S_WP_SIZES = [512, ] * 2 + [512, 512 * 2, ] * 4 + [512, 256 * 2, ] + [256, 128 * 2, ] + [128, 64 * 2, ] + [64, 32 * 2]
 
+import torch
+import numpy as np
+
+from models.stylegan2 import Generator
+
+class LatentSampler(object):
+
+    _LATENT_SPACE_DIM = 512
+
+    def __init__(self, args):
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        self.g_ema = Generator(
+            args.size, args.latent, args.n_mlp, channel_multiplier=args.channel_multiplier
+        ).to(self.device)
+        checkpoint = torch.load(args.ckpt, map_location=self.device)
+
+        self.g_ema.load_state_dict(checkpoint["g_ema"], strict=False)
+        self.mean_latent = self.g_ema.mean_latent(4096).cpu().detach().numpy()
+
+    def sample(self, num_samples):
+        z_codes = torch.randn(num_samples, LatentSampler._LATENT_SPACE_DIM, device=self.device)
+        w_codes = self.g_ema.get_latents([z_codes])[0].cpu().detach().numpy()
+
+        return w_codes
+
+def project_latent_to_plane(latent, boundary, intercept):
+    # https://stackoverflow.com/questions/9605556/how-to-project-a-point-onto-a-plane-in-3d
+    dist = latent.dot(boundary.T) + intercept
+    proj_latent = latent - dist * boundary
+    return proj_latent, np.squeeze(np.abs(dist))
 
 class GradientSampler(LatentSampler):
     def __init__(self, args):
@@ -305,17 +335,6 @@ def get_main_directions(latent_strengths, num_dir):
 
 
 def explore_latents(args):
-    # NOTE about truncation:
-    # We can truncate the sampled W first, instead of truncating after projection and editing. The pro is
-    # that than the middle latent is really a projected one and guaranteed to be frontal.
-    # However, this does not seem to have any effect in practice.
-
-    try:
-        from clearml import Task
-        task = Task.init(project_name="GANStudent",
-                         task_name=f'(Explore Latents)-({args.name})')  # This changes the seed
-    except ImportError:
-        print("Failed to import clearml, procceeding without starting a task...")
 
     torch.manual_seed(8)
     np.random.seed(8)
