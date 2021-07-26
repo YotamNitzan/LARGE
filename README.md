@@ -4,10 +4,11 @@
 <img src="docs/imgs/pipeline_fig.png" width="800px"/>
 </p>
 
-## [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/YotamNitzan/LARGE/blob/main/latent_regression.ipynb)
+<a href="https://arxiv.org/abs/2107.11186"><img src="https://img.shields.io/badge/arXiv-2008.00951-b31b1b.svg"></a>
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](http://colab.research.google.com/github/YotamNitzan/LARGE/blob/main/latent_regression.ipynb)
 
-<!-- ### [[Paper](https://arxiv.org/abs/2004.15021)]-->
-### [[Project Website](https://yotamnitzan.github.io/LARGE/)] [[Google Colab](http://colab.research.google.com/github/YotamNitzan/LARGE/blob/main/latent_regression.ipynb)]
+
+### [[Project Website](https://yotamnitzan.github.io/LARGE/)] [[Google Colab](http://colab.research.google.com/github/YotamNitzan/LARGE/blob/main/latent_regression.ipynb)] [[Paper](https://arxiv.org/abs/2107.11186)]
 
 LARGE: Latent-Based Regression through GAN Semantics
 
@@ -78,3 +79,16 @@ License (MIT) https://github.com/yuval-alaluf/restyle-encoder/blob/main/LICENSE
 ## Acknowledgement
 
 We would like to thank Raja Gyres, Yangyan Li, Or Patashnik, Yuval Alaluf, Amit Attia, Noga Bar and Zonzge Wu for helpful comments. We additionaly thank Zonzge Wu for the trained e4e models for AFHQ cats and dogs.
+
+## Citation
+If you use this code for your research, please cite our papers.
+```
+@misc{nitzan2021large,
+      title={LARGE: Latent-Based Regression through GAN Semantics}, 
+      author={Yotam Nitzan and Rinon Gal and Ofir Brenner and Daniel Cohen-Or},
+      year={2021},
+      eprint={2107.11186},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
